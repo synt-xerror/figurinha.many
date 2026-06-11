@@ -1,0 +1,21 @@
+{
+  "pack": "Sticker generado por ManyBot\n",
+  "author": "\nmanybot.stxerr.dev",
+  "error": {
+    "tooLarge": "No se pudo reducir el sticker debajo de 900KB.",
+    "generic": "Error al crear sticker. Intenta con otro archivo."
+  },
+  "session": {
+    "noneActive": "No hay sesión de sticker activa.",
+    "stopped": "Sesión de sticker finalizada.",
+    "noMedia": "No se ha recolectado ningún medio aún.",
+    "generating": "Creando stickers...",
+    "generatingOne": "Creando sticker...",
+    "alreadyOpen": "Sesión ya abierta.",
+    "waitExpire": "Espera a que expire o usa",
+    "expired": "Sesión expirada.",
+    "expiredEnd": "para iniciar una nueva.",
+    "started": "Sesión de sticker iniciada por",
+    "success": "¡Todos los stickers creados!"
+  }
+}

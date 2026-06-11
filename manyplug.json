@@ -1,0 +1,11 @@
+{
+    "name": "figurinha",
+	  "author": "SyntaxError <me@stxerr.dev> (https://www.stxerr.dev)",
+    "description": "Sticker creation plugin for Manybot.",
+    "version": "2.2.1",
+    "category": "media",
+    "service": false,
+    "dependencies": {
+        "wa-sticker-formatter": "*"
+    }
+}

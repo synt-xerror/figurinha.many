@@ -1,0 +1,21 @@
+{
+  "pack": "Figurinha gerada por ManyBot\n",
+  "author": "\nmanybot.stxerr.dev",
+  "error": {
+    "tooLarge": "Não foi possível reduzir figurinha abaixo de 900KB.",
+    "generic": "Falha ao criar figurinha. Tente outro arquivo."
+  },
+  "session": {
+    "noneActive": "Nenhuma sessão de figurinha ativa.",
+    "stopped": "Sessão de figurinha encerrada.",
+    "noMedia": "Nenhuma mídia coletada ainda.",
+    "generating": "Criando figurinhas...",
+    "generatingOne": "Criando figurinha...",
+    "alreadyOpen": "Sessão já aberta.",
+    "waitExpire": "Aguarde expirar ou use",
+    "expired": "Sessão expirada.",
+    "expiredEnd": "para iniciar uma nova.",
+    "started": "Sessão de figurinha iniciada por",
+    "success": "Todas as figurinhas criadas!"
+  }
+}
