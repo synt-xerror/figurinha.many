@@ -8,6 +8,7 @@
   },
   "description": "Sticker creation plugin for Manybot.",
   "version": "2.2.1",
+  "license": "MIT",
   "category": "media",
   "service": false,
   "dependencies": {
