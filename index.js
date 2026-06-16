@@ -129,22 +129,21 @@ export default async function (ctx) {
   const prefix  = ctx.config.get("CMD_PREFIX");
   const { t }   = ctx.i18n.createT(import.meta.url);
 
-  if (msg.is(prefix + "figurinha") || msg.is(prefix + "f")) {
-    const session = sessions.get(chatId);
-    if (!session) return;
-    if (!msg.hasMedia) return;
-    if (msg.sender !== session.author) return;
+  const isCmd = msg.is(prefix + "figurinha") || msg.is(prefix + "f");
 
+  if (isCmd && msg.hasMedia && sessions.has(chatId)) {
+    const session = sessions.get(chatId);
+    if (msg.sender !== session.author) return;
     const media = await msg.downloadMedia();
     if (!media) return;
-
     const gif = isGif(media, msg);
-
     if (isSupported(media, gif) && session.medias.length < MAX_MEDIA) {
       session.medias.push({ media, isGif: gif });
     }
     return;
   }
+
+  if (!isCmd) return; // ← guard: ignora tudo que não é o comando
 
   const sub = msg.args[1];
 
