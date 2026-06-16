@@ -118,14 +118,18 @@ function isSupported(media, isGif) {
   );
 }
 
+const isGif = (media, msg) =>
+  media.mimetype === "image/gif" ||
+  (media.mimetype === "video/mp4" && msg.isGif);
+
 // ── Plugin ───────────────────────────────────────────────────
 export default async function (ctx) {
   const { msg } = ctx;
-  const chatId   = ctx.chat.id;
-  const prefix   = ctx.config.get("CMD_PREFIX");
-  const { t }    = ctx.i18n.createT(import.meta.url);
+  const chatId  = ctx.chat.id;
+  const prefix  = ctx.config.get("CMD_PREFIX");
+  const { t }   = ctx.i18n.createT(import.meta.url);
 
-  if (!msg.is(prefix + "figurinha")) {
+  if (msg.is(prefix + "figurinha") || msg.is(prefix + "f")) {
     const session = sessions.get(chatId);
     if (!session) return;
     if (!msg.hasMedia) return;
@@ -134,9 +138,7 @@ export default async function (ctx) {
     const media = await msg.downloadMedia();
     if (!media) return;
 
-    const gif =
-      media.mimetype === "image/gif" ||
-      (media.mimetype === "video/mp4" && msg.isGif);
+    const gif = isGif(media, msg);
 
     if (isSupported(media, gif) && session.medias.length < MAX_MEDIA) {
       session.medias.push({ media, isGif: gif });
@@ -193,9 +195,7 @@ export default async function (ctx) {
   if (msg.hasMedia) {
     const media = await msg.downloadMedia();
     if (media) {
-      const gif =
-        media.mimetype === "image/gif" ||
-        (media.mimetype === "video/mp4" && msg.isGif);
+      const gif = isGif(media, msg);
 
       if (isSupported(media, gif)) {
         mediasParaCriar.push({ media, isGif: gif });
@@ -208,10 +208,7 @@ export default async function (ctx) {
     if (quoted?.hasMedia) {
       const media = await quoted.downloadMedia();
       if (media) {
-        const gif =
-          media.mimetype === "image/gif" ||
-          (media.mimetype === "video/mp4" && quoted.isGif);
-
+        const gif = isGif(media, quoted);
         if (isSupported(media, gif)) {
           mediasParaCriar.push({ media, isGif: gif });
         }
