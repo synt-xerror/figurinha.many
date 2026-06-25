@@ -1,6 +1,5 @@
 export const guardOptions = {
   timeout: false,
-  typing:  false,
   cooldown: false,
   jitter:  false,
 };
