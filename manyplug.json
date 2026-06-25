@@ -7,8 +7,9 @@
     "website": "https://www.stxerr.dev"
   },
   "description": "Sticker creation plugin for Manybot.",
-  "version": "2.2.3",
+  "version": "3.0.0",
   "license": "MIT",
+  "repo": "https://github.com/synt-xerror/figurinha.many",
   "category": "media",
   "service": false,
   "dependencies": {
