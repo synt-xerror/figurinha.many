@@ -273,5 +273,5 @@ export default async function (ctx) {
     timeout,
   });
 
-  await ctx.msg.reply.text(`${t("session.started")} *${msg.senderName}*!`);
+  await ctx.msg.reply.text(t("session.started")+prefix+"f criar");
 }

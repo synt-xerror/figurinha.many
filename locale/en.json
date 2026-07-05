@@ -15,7 +15,7 @@
     "alreadyOpen": "You already have an open session. To create the stickers, type {{command}}. Or, wait for the time to run out.",
     "expired": "Time is up. Type",
     "expiredEnd": "to start a new session.",
-    "started": "Sticker mode started! You can send your photos or videos now,",
+    "started": "Sticker session started! Send the media files, and then send: ",
     "created": "successfully created",
     "failed": "failed",
     "failDetail": "Reason for failures:"

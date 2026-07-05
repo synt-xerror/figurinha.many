@@ -15,7 +15,7 @@
     "alreadyOpen": "Ya tienes un lote abierto. Para crear las pegatinas, escribe {{command}}. O bien, espera a que se acabe el tiempo.",
     "expired": "El tiempo se ha agotado. Escribe",
     "expiredEnd": "para iniciar un nuevo envío.",
-    "started": "¡Modo sticker iniciado! Ya puedes enviar tus fotos o videos,",
+    "started": "¡Sesión de stickers iniciada! Envía los archivos multimedia y luego envía: ",
     "created": "creados con éxito",
     "failed": "fallaron",
     "failDetail": "Motivo de los errores:"
