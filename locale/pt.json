@@ -15,7 +15,7 @@
     "alreadyOpen": "Você já tem um lote aberto. Para criar as figurinhas, digite {{command}}. Ou, espere o tempo acabar.",
     "expired": "O tempo limite acabou. Digite",
     "expiredEnd": "para iniciar um novo envio.",
-    "started": "Sessão de figurinha iniciada! Envie as mídias e depois mande: ",
+    "started": "Sessão de figurinha iniciada! Envie as mídias e depois mande: `{{command}}`",
     "created": "criadas com sucesso",
     "failed": "falharam",
     "failDetail": "Motivo dos erros:"
