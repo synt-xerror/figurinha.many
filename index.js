@@ -2,10 +2,11 @@ export const guardOptions = {
   timeout: false,
   cooldown: false,
   jitter:  false,
+  typing:  false,
 };
 
-import fs            from "fs";
-import path          from "path";
+import fs           from "fs";
+import path         from "path";
 import { execFile }  from "child_process";
 import { promisify } from "util";
 
@@ -44,11 +45,18 @@ async function resizeImage(input, output) {
   await execFileAsync(FFMPEG, ["-i", input, "-vf", "scale=512:512:flags=lanczos", "-y", output]);
 }
 
-async function buildSticker(inputPath, isAnimated, t) {
+function classifyError(err, t) {
+  const m = err.message ?? "";
+  if (m === t("error.tooLarge") || /900\s*KB/i.test(m)) return t("error.tooLarge");
+  if (/invalid|corrupt|moov|codec|decode|unsupported/i.test(m))  return t("error.invalidFormat");
+  return t("error.conversionFailed");
+}
+
+async function buildSticker(inputPath, isAnimated, t, senderName, stickerAuthor) {
   for (const quality of [80, 60, 40, 20]) {
     const buf = await createSticker(fs.readFileSync(inputPath), {
-      pack:       t("pack"),
-      author:     t("author"),
+      pack:       senderName,
+      author:      stickerAuthor,
       type:       isAnimated ? "FULL" : "STATIC",
       categories: ["🤖"],
       quality,
@@ -73,7 +81,7 @@ function isSupported(media, gif) {
   );
 }
 
-async function processarUmaMedia(media, gif, ctx, t) {
+async function processarUmaMedia(media, gif, ctx, t, stickerName, stickerAuthor) {
   ensureDir();
 
   const ext        = media.mimetype.split("/")[1];
@@ -89,35 +97,39 @@ async function processarUmaMedia(media, gif, ctx, t) {
 
     let stickerInput;
     if (isAnimated) {
-      await convertToGif(inputPath, gifPath, isAnimated ? 12 : 24);
+      await convertToGif(inputPath, gifPath, 12);
       stickerInput = gifPath;
     } else {
       await resizeImage(inputPath, resizedPath);
       stickerInput = resizedPath;
     }
 
-    const buf = await buildSticker(stickerInput, isAnimated, t);
+    const buf = await buildSticker(stickerInput, isAnimated, t, stickerName, stickerAuthor);
     await ctx.send.sticker(buf);
-    return true;
+    return { ok: true };
   } catch (err) {
-    ctx.log.error(`Sticker generation error: ${err.message}`);
-    await ctx.msg.reply.text(t("error.generic"));
-    return false;
+    ctx.log.error(`Sticker error: ${err.message}`);
+    return { ok: false, reason: classifyError(err, t) };
   } finally {
     cleanup(inputPath, gifPath, resizedPath);
   }
 }
 
 export default async function (ctx) {
+  // Evita auto-gatilho e loops infinitos no processamento de texto/mídia
+  if (ctx.msg.fromMe) return;
+
   const { msg, chat } = ctx;
   const { t }         = ctx.i18n.createT(import.meta.url);
   const prefix        = ctx.config.get("CMD_PREFIX");
   const chatId        = chat.id;
+  const fName         = ctx.config.get("FIG_NAME", null)   || `Por ${msg.senderName}\n`;
+  const fAuthor       = ctx.config.get("FIG_AUTHOR", null) || `\nManyBot\nmanybot.stxerr.dev`;
 
   const isCmd = msg.is("figurinha") || msg.is("f");
 
   // ── coleta de mídia em sessão aberta ─────────────────────
-  if (msg.hasMedia && sessions.has(chatId)) {
+  if (!isCmd && msg.hasMedia && sessions.has(chatId)) {
     const session = sessions.get(chatId);
     if (msg.sender !== session.author) return;
 
@@ -139,7 +151,7 @@ export default async function (ctx) {
   if (sub === "parar") {
     const session = sessions.get(chatId);
     if (!session) {
-      await ctx.msg.reply.text(t("session.noneActive"));
+      await ctx.msg.reply.text(t("session.noneActive", { command: prefix + "f" }));
       return;
     }
     clearTimeout(session.timeout);
@@ -152,7 +164,7 @@ export default async function (ctx) {
   if (sub === "criar") {
     const session = sessions.get(chatId);
     if (!session) {
-      await ctx.msg.reply.text(t("session.noneActive"));
+      await ctx.msg.reply.text(t("session.noneActive", { command: prefix + "f" }));
       return;
     }
     if (!session.medias.length) {
@@ -161,16 +173,38 @@ export default async function (ctx) {
     }
   
     clearTimeout(session.timeout);
-    sessions.delete(chatId);  // ← move pra cá, antes do loop
+    sessions.delete(chatId);
   
     await ctx.msg.reply.text(t("session.generating"));
   
-    for (const { media, isGif } of session.medias) {
-      await processarUmaMedia(media, isGif, ctx, t);
-    }
-  
-    await ctx.send.text(t("session.success"));
-    ctx.utils.emptyFolder(DOWNLOADS_DIR);
+    // Processamento pesado do lote enviado para a fila gerenciada pelo kernel
+    ctx.download.enqueue(
+      async () => {
+        const results = [];
+        for (const { media, isGif } of session.medias) {
+          results.push(await processarUmaMedia(media, isGif, ctx, t, fName, fAuthor));
+        }
+
+        const ok   = results.filter(r => r.ok).length;
+        const fail = results.filter(r => !r.ok).length;
+        const summary = `✅ ${ok} ${t("session.created")}, ❌ ${fail} ${t("session.failed")}`;
+
+        if (fail > 0) {
+          const lines = results
+            .map((r, i) => !r.ok ? `• ${i + 1}. ${r.reason}` : null)
+            .filter(Boolean)
+            .join("\n");
+          await ctx.send.text(`${summary}\n\n${t("session.failDetail")}\n${lines}`);
+        } else {
+          await ctx.send.text(summary);
+        }
+        ctx.utils.emptyFolder(DOWNLOADS_DIR);
+      },
+      async (err) => {
+        ctx.log.error(`Erro ao processar lote: ${err.message}`);
+        await ctx.send.text(t("error.conversionFailed"));
+      }
+    );
     return;
   }
 
@@ -190,7 +224,7 @@ export default async function (ctx) {
     if (quoted?.hasMedia) {
       const media = await quoted.downloadMedia();
       if (media) {
-        const gif = isGifMedia(media, quoted._data?.isGif ?? false);
+        const gif = isGifMedia(media, quoted.isGif ?? false);
         if (isSupported(media, gif)) mediasParaCriar.push({ media, isGif: gif });
       }
     }
@@ -198,18 +232,28 @@ export default async function (ctx) {
 
   if (mediasParaCriar.length > 0) {
     await ctx.msg.reply.text(t("session.generatingOne"));
-    for (const { media, isGif } of mediasParaCriar) {
-      await processarUmaMedia(media, isGif, ctx, t);
-    }
-    ctx.utils.emptyFolder(DOWNLOADS_DIR);
+
+    // Mídias imediatas também passam pela fila para não bloquear o Event Loop
+    ctx.download.enqueue(
+      async () => {
+        for (const { media, isGif } of mediasParaCriar) {
+          const result = await processarUmaMedia(media, isGif, ctx, t, fName, fAuthor);
+          if (!result.ok) await ctx.msg.reply.text(`❌ ${result.reason}`);
+        }
+        ctx.utils.emptyFolder(DOWNLOADS_DIR);
+      },
+      async (err) => {
+        ctx.log.error(`Erro ao criar figurinha direta: ${err.message}`);
+        await ctx.msg.reply.text(t("error.conversionFailed"));
+      }
+    );
     return;
   }
 
   // ── figurinha sem mídia → abre sessão ───────────────────
   if (sessions.has(chatId)) {
     await ctx.msg.reply.text(
-      `${t("session.alreadyOpen")} \`${prefix}figurinha criar\`.\n` +
-      t("session.waitExpire")
+      `${t("session.alreadyOpen", { command: prefix + "f criar"})}`
     );
     return;
   }

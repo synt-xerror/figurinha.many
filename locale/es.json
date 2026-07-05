@@ -1,21 +1,23 @@
 {
-  "pack": "Sticker generado por ManyBot\n",
+  "pack": "Sticker creado por ManyBot\n",
   "author": "\nmanybot.stxerr.dev",
   "error": {
-    "tooLarge": "No se pudo reducir el sticker debajo de 900KB.",
-    "generic": "Error al crear sticker. Intenta con otro archivo."
+    "tooLarge": "El archivo es demasiado grande para WhatsApp, incluso reduciendo la calidad.",
+    "invalidFormat": "Este archivo parece dañado o el formato no es compatible.",
+    "conversionFailed": "No se pudo transformar este archivo en sticker. Intenta con otro."
   },
   "session": {
-    "noneActive": "No hay sesión de sticker activa.",
-    "stopped": "Sesión de sticker finalizada.",
-    "noMedia": "No se ha recolectado ningún medio aún.",
-    "generating": "Creando stickers...",
-    "generatingOne": "Creando sticker...",
-    "alreadyOpen": "Sesión ya abierta.",
-    "waitExpire": "Espera a que expire o usa",
-    "expired": "Sesión expirada.",
-    "expiredEnd": "para iniciar una nueva.",
-    "started": "Sesión de sticker iniciada por",
-    "success": "¡Todos los stickers creados!"
+    "noneActive": "No hay ninguna sesión activa. Escribe {{command}} para comenzar.",
+    "stopped": "Envío de archivos cancelado.",
+    "noMedia": "Aún no has enviado ninguna foto o video.",
+    "generating": "Preparando tus stickers, por favor espera...",
+    "generatingOne": "Creando el sticker, espera un momento...",
+    "alreadyOpen": "Ya tienes un lote abierto. Para crear las pegatinas, escribe {{command}}. O bien, espera a que se acabe el tiempo.",
+    "expired": "El tiempo se ha agotado. Escribe",
+    "expiredEnd": "para iniciar un nuevo envío.",
+    "started": "¡Modo sticker iniciado! Ya puedes enviar tus fotos o videos,",
+    "created": "creados con éxito",
+    "failed": "fallaron",
+    "failDetail": "Motivo de los errores:"
   }
 }
