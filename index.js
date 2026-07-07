@@ -124,7 +124,7 @@ export default async function (ctx) {
   const prefix        = ctx.config.get("CMD_PREFIX");
   const chatId        = chat.id;
   const fName         = ctx.config.get("FIG_NAME", null)   || `${msg.senderName}\n`;
-  const fAuthor       = ctx.config.get("FIG_AUTHOR", null) || `\nManyBot\nmanybot.stxerr.dev`;
+  const fAuthor       = ctx.config.get("FIG_AUTHOR", null) || `\nManyBot\nwww.manybot.org`;
 
   const isCmd = msg.is("figurinha") || msg.is("f");
 
