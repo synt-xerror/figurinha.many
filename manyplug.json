@@ -12,7 +12,5 @@
   "repo": "https://github.com/synt-xerror/figurinha.many",
   "category": "media",
   "service": false,
-  "dependencies": {
-    "wa-sticker-formatter": "*"
-  }
+  "dependencies": {}
 }
